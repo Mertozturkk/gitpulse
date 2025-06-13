@@ -12,76 +12,98 @@ import (
 
 var tuiCmd = &cobra.Command{
 	Use:   "tui",
-	Short: "Launch interactive terminal dashboard",
+	Short: "Launch tab-based interactive terminal UI",
 	Run: func(cmd *cobra.Command, args []string) {
+		tabs := []string{"Summary", "Authors", "Heatmap"}
+		currentTab := 0
+
 		app := tview.NewApplication()
-		grid := tview.NewGrid().
-			SetRows(0, 0).
-			SetColumns(0, 0).
-			SetBorders(true)
 
-		summary := git.GetRepoSummary()
-		summaryText := fmt.Sprintf(`📁 Repo: %s
-🧾 Commits: %d
-👥 Contributors: %d
-🕐 First: %s
-📆 Last: %s
-📈 Avg/day: %.2f`,
-			summary.Name,
-			summary.TotalCommits,
-			summary.UniqueAuthors,
-			summary.FirstCommit.Format("2006-01-02"),
-			summary.LastCommit.Format("2006-01-02"),
-			summary.AvgCommitsPerDay,
-		)
+		var tabBar *tview.TextView = tview.NewTextView()
+		tabBar.SetDynamicColors(true)
+		tabBar.SetTextAlign(tview.AlignCenter)
+		tabBar.SetBorder(true)
+		tabBar.SetTitle(" Tabs ")
 
-		summaryBox := tview.NewTextView()
-		summaryBox.SetText(summaryText)
-		summaryBox.SetDynamicColors(true)
-		summaryBox.SetBorder(true)
-		summaryBox.SetTitle(" Repo Summary ")
-		summaryBox.SetChangedFunc(func() { app.Draw() })
+		var mainContent *tview.TextView = tview.NewTextView()
+		mainContent.SetDynamicColors(true)
+		mainContent.SetBorder(true)
+		mainContent.SetTitle(" Content ")
 
-		authors := git.GetTopAuthors(5)
-		authorsText := ""
-		for i, a := range authors {
-			authorsText += fmt.Sprintf("%d. %-15s (%d)\n", i+1, a.Name, a.Commits)
+		draw := func() {
+			tabLine := ""
+			for i, tab := range tabs {
+				if i == currentTab {
+					tabLine += fmt.Sprintf("[yellow][ %s ][-] ", tab)
+				} else {
+					tabLine += fmt.Sprintf("  %s   ", tab)
+				}
+			}
+			tabBar.SetText(tabLine)
+
+			switch tabs[currentTab] {
+			case "Summary":
+				summary := git.GetRepoSummary()
+				mainContent.SetTitle(" Repo Summary ")
+				mainContent.SetText(fmt.Sprintf(`📁 Repo: %s
+					🧾 Commits: %d
+					👥 Contributors: %d
+					🕐 First: %s
+					📆 Last: %s
+					📈 Avg/day: %.2f`,
+					summary.Name,
+					summary.TotalCommits,
+					summary.UniqueAuthors,
+					summary.FirstCommit.Format("2006-01-02"),
+					summary.LastCommit.Format("2006-01-02"),
+					summary.AvgCommitsPerDay,
+				))
+			case "Authors":
+				authors := git.GetTopAuthors(10)
+				mainContent.SetTitle(" Top Contributors ")
+				authorsText := ""
+				for i, a := range authors {
+					authorsText += fmt.Sprintf("%d. %-15s (%d commits)\n", i+1, a.Name, a.Commits)
+				}
+				mainContent.SetText(authorsText)
+			case "Heatmap":
+				heatmap := git.GetCommitHeatmap("")
+				mainContent.SetTitle(" Commit Heatmap ")
+				heatmapText := ""
+				for _, day := range git.Weekdays {
+					bar := git.Bar(heatmap[day])
+					heatmapText += fmt.Sprintf("%s: %-20s (%d)\n", day, bar, heatmap[day])
+				}
+				mainContent.SetText(heatmapText)
+			}
 		}
 
-		authorsBox := tview.NewTextView()
-		authorsBox.SetText(authorsText)
-		authorsBox.SetDynamicColors(true)
-		authorsBox.SetBorder(true)
-		authorsBox.SetTitle(" Top Authors ")
-		authorsBox.SetChangedFunc(func() { app.Draw() })
+		draw()
 
-		heatmap := git.GetCommitHeatmap("")
-		heatmapText := ""
-		for _, day := range git.Weekdays {
-			bar := git.Bar(heatmap[day])
-			heatmapText += fmt.Sprintf("%s: %-20s (%d)\n", day, bar, heatmap[day])
-		}
+		flex := tview.NewFlex().
+			SetDirection(tview.FlexRow).
+			AddItem(tabBar, 3, 1, false).
+			AddItem(mainContent, 0, 1, true)
 
-		heatmapBox := tview.NewTextView()
-		heatmapBox.SetText(heatmapText)
-		heatmapBox.SetDynamicColors(true)
-		heatmapBox.SetBorder(true)
-		heatmapBox.SetTitle(" Commit Heatmap ")
-		heatmapBox.SetChangedFunc(func() { app.Draw() })
-
-		grid.AddItem(summaryBox, 0, 0, 1, 1, 0, 0, false)
-		grid.AddItem(authorsBox, 0, 1, 1, 1, 0, 0, false)
-		grid.AddItem(heatmapBox, 1, 0, 1, 2, 0, 0, false)
-
-		grid.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-			if event.Rune() == 'q' || event.Rune() == 'Q' {
-				app.Stop()
+		flex.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+			switch event.Key() {
+			case tcell.KeyRight:
+				currentTab = (currentTab + 1) % len(tabs)
+				draw()
 				return nil
+			case tcell.KeyLeft:
+				currentTab = (currentTab - 1 + len(tabs)) % len(tabs)
+				draw()
+			case tcell.KeyRune:
+				if event.Rune() == 'q' || event.Rune() == 'Q' {
+					app.Stop()
+					return nil
+				}
 			}
 			return event
 		})
 
-		if err := app.SetRoot(grid, true).EnableMouse(true).Run(); err != nil {
+		if err := app.SetRoot(flex, true).EnableMouse(true).Run(); err != nil {
 			panic(err)
 		}
 	},
