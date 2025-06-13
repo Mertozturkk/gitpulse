@@ -20,6 +20,11 @@ It supports both **command-line** and **interactive terminal UI (TUI)** modes fo
 
 ---
 
+
+### 📦 Download
+
+➡️ [Latest Release](https://github.com/Mertozturkk/gitpulse/releases/latest)
+
 ## ⚙️ Installation
 
 > Requires **Go 1.21+** installed
