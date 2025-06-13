@@ -11,7 +11,7 @@ var authorsCmd = &cobra.Command{
 	Use:   "authors",
 	Short: "Show top contributors by commit count",
 	Run: func(cmd *cobra.Command, args []string) {
-		authors := git.GetTopAuthors()
+		authors := git.GetTopAuthors(topN)
 
 		fmt.Println("👤 Contributors:")
 		fmt.Println("────────────────────")
@@ -21,8 +21,9 @@ var authorsCmd = &cobra.Command{
 	},
 }
 
+var topN int
+
 func init() {
+	authorsCmd.Flags().IntVar(&topN, "top", 10, "Limit the number of authors to show")
 	rootCmd.AddCommand(authorsCmd)
 }
-
-// if contributors count is too high, we can limit the output like --top 10

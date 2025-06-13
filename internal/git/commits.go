@@ -20,14 +20,13 @@ func GetRepoSummary() RepoSummary {
 	total := runGit("rev-list --count HEAD")
 	first := runGit("log --reverse --format=%cs | head -n 1")
 	last := runGit("log -1 --format=%cs")
-	authors := runGit("shortlog -sne | wc -l")
 
 	firstTime, _ := time.Parse("2006-01-02", first)
 	lastTime, _ := time.Parse("2006-01-02", last)
 
 	days := int(lastTime.Sub(firstTime).Hours()/24) + 1
 	commitCount := toInt(total)
-	authorCount := toInt(authors)
+	authorCount := countAuthors()
 
 	return RepoSummary{
 		Name:             getRepoName(),
@@ -52,4 +51,14 @@ func toInt(s string) int {
 func getRepoName() string {
 	out, _ := exec.Command("bash", "-c", "basename `git rev-parse --show-toplevel`").Output()
 	return strings.TrimSpace(string(out))
+}
+
+func countAuthors() int {
+	cmd := exec.Command("git", "shortlog", "-s", "-n", "--all", "--no-merges")
+	out, err := cmd.Output()
+	if err != nil {
+		return 0
+	}
+	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+	return len(lines)
 }

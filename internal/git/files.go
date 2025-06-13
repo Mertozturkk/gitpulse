@@ -13,7 +13,7 @@ type DirStat struct {
 }
 
 func GetChangedDirectories() []DirStat {
-	cmd := exec.Command("git", "log", "--name-only", "--pretty=format:", "| grep -v '^$'")
+	cmd := exec.Command("git", "log", "--name-only", "--pretty=format:")
 	out, err := cmd.Output()
 	if err != nil {
 		return []DirStat{}
