@@ -1,6 +1,6 @@
 module github.com/Mertozturkk/gitpulse
 
-go 1.21.4
+go 1.21
 
 require (
 	github.com/gdamore/encoding v1.0.1 // indirect
