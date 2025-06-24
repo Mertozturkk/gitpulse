@@ -20,14 +20,23 @@ It supports both **command-line** and **interactive terminal UI (TUI)** modes fo
 
 ---
 
-
-### 📦 Download
-
-➡️ [Latest Release](https://github.com/Mertozturkk/gitpulse/releases/latest)
-
 ## ⚙️ Installation
 
 > Requires **Go 1.21+** installed
+
+### 🚀 Quick Install (Recommended for Developers)
+
+You can install the latest version directly with Go:
+
+```sh
+go install github.com/Mertozturkk/gitpulse@latest
+```
+
+Make sure your Go bin directory is in your `PATH` (usually `$HOME/go/bin`):
+
+```sh
+export PATH="$PATH:$(go env GOPATH)/bin"
+```
 
 ### 🧱 Build from Source
 
@@ -39,7 +48,7 @@ cd gitpulse
 go build -o gitpulse
 ```
 
-### Windows
+#### Windows
 
 ```sh
 git clone https://github.com/Mertozturkk/gitpulse.git
@@ -47,7 +56,9 @@ cd gitpulse
 go build -o gitpulse.exe
 ```
 
-🚀 Usage
+---
+
+## 🚦 Usage
 
 Run from the root of a Git repository:
 
@@ -81,9 +92,8 @@ gitpulse dirs
 gitpulse tui
 ```
 
-•	Navigate tabs with ← → arrows
+•	Navigate tabs with ← → arrows  
 •	Press q to quit
-
 
 🔹 Help
 
@@ -91,14 +101,26 @@ gitpulse tui
 gitpulse --help
 ```
 
-🛠️ Contributing
+---
 
-Pull requests and issues are welcome!
+## 🛠️ Contributing
+
+Pull requests and issues are welcome!  
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute.
+
 1.	Fork the repository
 2.	Create a feature branch
 3.	Open a pull request
 4.	Describe your changes clearly
+
+---
+
+## 📦 Versioning & Releases
+
+This project uses [semantic versioning](https://semver.org/) for long-term maintainability.  
+You can always install the latest stable version with the `@latest` tag using Go, or check [Releases](https://github.com/Mertozturkk/gitpulse/releases) for versioned binaries in the future.
+
+---
 
 ## License
 
