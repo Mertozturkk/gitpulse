@@ -32,11 +32,19 @@ You can install the latest version directly with Go:
 go install github.com/Mertozturkk/gitpulse@latest
 ```
 
-Make sure your Go bin directory is in your `PATH` (usually `$HOME/go/bin`):
+Make sure your Go bin directory is in your `PATH`:
 
-```sh
-export PATH="$PATH:$(go env GOPATH)/bin"
-```
+- **Linux/macOS (bash/zsh):**
+
+  ```sh
+  export PATH="$PATH:$(go env GOPATH)/bin"
+  ```
+
+- **Windows (PowerShell):**
+
+  ```powershell
+  $env:Path += ";$env:USERPROFILE\go\bin"
+  ```
 
 ### 🧱 Build from Source
 
@@ -92,8 +100,8 @@ gitpulse dirs
 gitpulse tui
 ```
 
-•	Navigate tabs with ← → arrows  
-•	Press q to quit
+• Navigate tabs with ← → arrows  
+• Press q to quit
 
 🔹 Help
 
@@ -108,10 +116,10 @@ gitpulse --help
 Pull requests and issues are welcome!  
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute.
 
-1.	Fork the repository
-2.	Create a feature branch
-3.	Open a pull request
-4.	Describe your changes clearly
+1. Fork the repository  
+2. Create a feature branch  
+3. Open a pull request  
+4. Describe your changes clearly
 
 ---
 
